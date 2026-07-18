@@ -1,0 +1,3 @@
+bleak>=0.22,<2
+aiohttp>=3.13,<4
+cryptography>=45,<49

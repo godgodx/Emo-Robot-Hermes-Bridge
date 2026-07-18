@@ -1,0 +1,13 @@
+[Unit]
+Description=Bluetooth controller for deferred EMO replies
+After=bluetooth.service
+Wants=bluetooth.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/sbin/rfkill unblock bluetooth
+ExecStart=/usr/bin/hciconfig hci0 up
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target

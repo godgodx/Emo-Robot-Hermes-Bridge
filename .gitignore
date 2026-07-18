@@ -1,0 +1,14 @@
+__pycache__/
+*.py[cod]
+.venv/
+.env
+.env.*
+.coverage
+.pytest_cache/
+.ruff_cache/
+captures/
+certs/
+logs/
+ack-audio/
+*.log
+local-config.json
