@@ -15,6 +15,7 @@
 - Start live-device validation with reversible display, speech, or animation actions. Require explicit user direction before movement, shutdown, Wi-Fi changes, firmware operations, or persistent settings.
 - Keep deterministic response and action routing testable without a robot or an AI/network dependency.
 - Treat network interception as an explicit opt-in mode with visible logs, narrow host scope, and transparent pass-through for unhandled traffic.
+- Do not advertise upstream response compression on EMO's behalf; its firmware requires uncompressed JSON for initialization routes such as `/token/*`.
 - Answer `/time` locally with EMO's compact Unix-time and requested-timezone-offset envelope; do not relay that initialization route upstream.
 - Keep live response-replacement experiments bounded to one successful voice request, preserve the observed response envelope, decode declared transport compression before JSON changes, and restore pass-through mode immediately after validation.
 - Integrate Hermes through its official loopback-only API server instead of modifying Hermes core. Accept only complete `finish_reason=stop` results, serialize EMO turns per Hermes session, and preserve the original Living.AI response as the runtime fallback.

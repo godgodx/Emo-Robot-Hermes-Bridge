@@ -22,6 +22,7 @@ from emo_agent.gateway import (
     forwarded_headers,
     living_ai_audio_url,
     localize_tts_response,
+    safe_request_path,
     safe_event,
     time_payload,
     tts_audio_endpoint,
@@ -80,13 +81,27 @@ class ProtocolTests(unittest.TestCase):
 
     def test_gateway_forwards_auth_without_logging_it(self) -> None:
         headers = forwarded_headers(
-            [("Host", "api.living.ai"), ("Authorization", "private"), ("Secret", "private-too")]
+            [
+                ("Host", "api.living.ai"),
+                ("Authorization", "private"),
+                ("Secret", "private-too"),
+                ("Accept-Encoding", "gzip"),
+            ]
         )
         self.assertEqual(headers["Authorization"], "private")
         self.assertEqual(headers["Secret"], "private-too")
         self.assertNotIn("Host", headers)
+        self.assertNotIn("Accept-Encoding", headers)
         event = safe_event(event="relay", method="POST", path="/emo/voice/detectintent")
         self.assertNotIn("private", event)
+
+    def test_gateway_redacts_device_and_audio_tokens_in_logged_paths(self) -> None:
+        self.assertEqual(safe_request_path("/token/device-id"), "/token/<redacted>")
+        self.assertEqual(
+            safe_request_path("/_emo_agent/tts/unguessable"),
+            "/_emo_agent/tts/<redacted>",
+        )
+        self.assertEqual(safe_request_path("/emo/voice/detectintent"), "/emo/voice/detectintent")
 
     def test_gateway_builds_compact_local_time_with_requested_offset(self) -> None:
         payload = time_payload("America/Halifax", epoch=1_767_225_600)

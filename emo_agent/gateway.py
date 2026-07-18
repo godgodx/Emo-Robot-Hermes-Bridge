@@ -69,6 +69,7 @@ HOP_BY_HOP_HEADERS = {
     "transfer-encoding",
     "upgrade",
 }
+FIRMWARE_INCOMPATIBLE_REQUEST_HEADERS = {"accept-encoding"}
 
 
 @dataclass
@@ -84,7 +85,10 @@ def forwarded_headers(items: Iterable[tuple[str, str]]) -> dict[str, str]:
     return {
         name: value
         for name, value in items
-        if name.lower() not in HOP_BY_HOP_HEADERS | {"host", "content-length"}
+        if name.lower()
+        not in HOP_BY_HOP_HEADERS
+        | FIRMWARE_INCOMPATIBLE_REQUEST_HEADERS
+        | {"host", "content-length"}
     }
 
 
@@ -99,6 +103,14 @@ def response_headers(items: Iterable[tuple[str, str]]) -> dict[str, str]:
 def safe_event(**values: object) -> str:
     """Serialize only explicitly supplied, non-secret observation metadata."""
     return json.dumps(values, ensure_ascii=False, separators=(",", ":"))
+
+
+def safe_request_path(path: str) -> str:
+    """Redact identifiers and unguessable tokens embedded in request paths."""
+    for prefix in ("/token/", "/_emo_agent/audio/", "/_emo_agent/tts/"):
+        if path.startswith(prefix):
+            return prefix + "<redacted>"
+    return path
 
 
 def time_payload(timezone_name: str, epoch: int | None = None) -> bytes:
@@ -454,7 +466,7 @@ async def relay(request: web.Request) -> web.Response:
             safe_event(
                 event="upstream_error",
                 method=request.method,
-                path=request.path,
+                path=safe_request_path(request.path),
                 request_bytes=len(body),
                 error=type(exc).__name__,
             ),
@@ -661,7 +673,7 @@ async def relay(request: web.Request) -> web.Response:
         safe_event(
             event="relay",
             method=request.method,
-            path=request.path,
+            path=safe_request_path(request.path),
             status=status,
             request_bytes=len(body),
             response_bytes=len(response_body),
@@ -723,7 +735,14 @@ async def create_app(
         "tts_audio_cache": OrderedDict(),
     }
     timeout = ClientTimeout(total=45, connect=10)
-    app["upstream_session"] = ClientSession(timeout=timeout, auto_decompress=False)
+    # aiohttp otherwise advertises gzip even when EMO did not. Living.AI then
+    # compresses small JSON responses such as /token/*, but EMO's firmware
+    # expects the uncompressed JSON produced by the original Go proxy.
+    app["upstream_session"] = ClientSession(
+        timeout=timeout,
+        auto_decompress=False,
+        skip_auto_headers={"Accept-Encoding"},
+    )
     if one_shot_test is not None:
         app["one_shot_test"] = one_shot_test
     if hermes_bridge is not None:
