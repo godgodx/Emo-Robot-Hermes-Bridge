@@ -100,8 +100,8 @@ machine is ambiguous, it stops instead of guessing:
 sudo ./install.sh \
   --uplink wlan0 \
   --wifi wlan1 \
-  --user pi \
-  --hermes-bin /home/pi/.hermes/hermes-agent/venv/bin/hermes
+  --user "$USER" \
+  --hermes-bin "$HOME/.hermes/hermes-agent/venv/bin/hermes"
 ```
 
 At the end, the installer prints the EMO Wi-Fi name and the protected path containing its

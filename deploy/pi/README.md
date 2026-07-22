@@ -40,8 +40,8 @@ sudo ./install.sh \
   --uplink wlan0 \
   --wifi wlan1 \
   --ssid EMO-HERMES \
-  --user pi \
-  --hermes-bin /home/pi/.hermes/hermes-agent/venv/bin/hermes
+  --user "$USER" \
+  --hermes-bin "$HOME/.hermes/hermes-agent/venv/bin/hermes"
 ```
 
 `--preflight-only` is read-only. A normal run summarizes the resolved topology and asks

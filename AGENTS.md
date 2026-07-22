@@ -28,6 +28,7 @@
 - Keep Hermes API credentials in protected host configuration only. Never log transcripts, prompts, final answers, keys, authorization headers, or intermediate agent events.
 - Treat spoken `/new` equivalents as exact, accent-insensitive control phrases rather than substring matches. Cancel active EMO Hermes turns, serialize the rotation to a fresh session identifier, preserve every earlier Hermes session, persist the active identifier across restarts, and confirm through the dedicated cached Living.AI clip.
 - Present the public project as an independent Hermes Agent gateway for EMO, state clearly that Living.AI still provides STT/TTS, and avoid claims of affiliation or fully offline operation.
+- Keep public documentation and automation free of machine-specific absolute paths. Use runtime discovery, environment variables, or clearly identified placeholders; explicit system installation paths such as `/etc/emo-agent` remain part of the deployment contract.
 - Keep `install.sh` as the primary installation entrypoint. It may auto-detect only unambiguous interfaces and common Hermes paths, must preserve the existing Internet/SSH connection, and must require confirmation before network changes unless `--yes` is explicit.
 
 # Work Guidance
@@ -38,10 +39,10 @@
 
 # Verification
 
-- Run `C:\Python312\python.exe -m unittest discover -s tests -v` from this directory.
-- Run `C:\Python312\python.exe -m compileall -q emo_agent tests` from this directory.
+- Run `python -m unittest discover -s tests -v` from a Python 3.12 environment in this directory.
+- Run `python -m compileall -q emo_agent tests` from the same environment.
 - Run `bash -n install.sh deploy/pi/*.sh` and ShellCheck over the same scripts before publishing installer changes.
-- Run `C:\Python312\python.exe -m emo_agent scan` before any live action test.
+- Run `python -m emo_agent scan` before any live action test.
 - Run the HTTPS gateway on port 8443 and probe `/_emo_agent/health` before attempting port 443 or changing EMO's DNS path.
 - Validate Hermes mode with an isolated API smoke-test session before a live EMO request; verify the physical robot receives both the final speech and the selected animation in the order owned by the active delivery path.
 - Validate both Hermes SSE paths with isolated sessions: a simple request must complete without a tool-start event and a forced-tool request must emit one. Delete both smoke sessions afterwards.

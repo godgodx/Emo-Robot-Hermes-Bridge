@@ -1,6 +1,10 @@
 __pycache__/
 *.py[cod]
 .venv/
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
 .env
 .env.*
 .coverage
@@ -11,4 +15,11 @@ certs/
 logs/
 ack-audio/
 *.log
+*.har
+*.pcap
+*.pcapng
+*.key
+*.pem
+*.p12
+*.pfx
 local-config.json

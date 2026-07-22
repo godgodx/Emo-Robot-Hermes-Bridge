@@ -9,6 +9,7 @@
 # Local Contracts
 
 - Keep CI free of repository, robot, network, and account secrets.
+- Keep validation workflows read-only. They must not commit, push, publish, or deploy unless a future task explicitly introduces and documents that behavior.
 - Validate Python behavior, compilation, and shell syntax on every push and pull request.
 - Use only maintained, version-pinned major releases of GitHub Actions.
 
